@@ -1,0 +1,129 @@
+
+/* =================================
+   MODO - Main Stylesheet
+================================= */
+
+/* 1. Design tokens */
+
+:root {
+    --color-ink: #20201E;
+    --color-background: #F4F3EF;
+    --color-sand: #D6D1C5;
+    --color-sage: #B6C6B0;
+    --color-white: #FFFFFF;
+    --color-muted: #77766F;
+    --color-border: #E4E1DA;
+
+    --font-main: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    --radius-button: 10px;
+    --radius-card: 16px;
+}
+
+
+/* 2. Global styles */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--color-background);
+    color: var(--color-ink);
+    margin: 0;
+    line-height: 1.6;
+}
+
+
+/* 3. Navigation */
+
+.modo-navbar {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    padding: 18px 0;
+}
+
+.modo-logo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: var(--color-ink);
+}
+
+.modo-logo:hover {
+    color: var(--color-ink);
+}
+
+.modo-logo span {
+    color: var(--color-sage);
+}
+
+.navbar-nav {
+    gap: 24px;
+}
+
+.nav-link {
+    color: var(--color-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--color-ink);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.login-link {
+    color: var(--color-ink);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.modo-button {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+    border-radius: var(--radius-button);
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.modo-button:hover {
+    background-color: #3A3A36;
+    color: var(--color-white);
+}
+
+
+/* 4. Footer */
+
+.modo-footer {
+    padding: 30px 0;
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+    color: var(--color-muted);
+    font-size: 13px;
+}
+
+
+/* 5. Responsive navigation */
+
+@media (max-width: 991px) {
+
+    .navbar-nav {
+        gap: 8px;
+        padding: 20px 0;
+    }
+
+    .nav-actions {
+        padding-bottom: 12px;
+    }
+
+}
