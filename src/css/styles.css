@@ -63,21 +63,19 @@ body {
     gap: 24px;
 }
 
-.nav-link {
-    color: var(--color-muted);
-    font-size: 14px;
-    font-weight: 500;
-}
 
-.nav-link:hover,
-.nav-link.active {
-    color: var(--color-ink);
-}
 
 .nav-actions {
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.nav-actions.active {
+    color: #20201E;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 6px;
 }
 
 .login-link {
