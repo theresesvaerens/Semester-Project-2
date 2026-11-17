@@ -6,7 +6,7 @@
   <title>Log in | MODO</title>
 
 <body>
-  
+
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
       <a class="navbar-brand fw-bold" href="index.html">MODO</a>
@@ -20,8 +20,72 @@
     </div>
   </nav>
 
+<main class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-7 col-lg-5">
 
+        <div class="text-center mb-4">
+          <h1 class="fw-bold">Welcome back</h1>
+          <p class="text-muted">
+            Log in to discover great finds and deals.
+          </p>
+        </div>
 
+        <form id="loginForm">
+
+       <div class="mb-3">
+            <label for="email" class="form-label">
+              Student email
+            </label>
+
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              placeholder="name@stud.noroff.no"
+              required
+            >
+          </div>
+          
+         <div class="mb-4">
+            <label for="password" class="form-label">
+              Password
+            </label>
+
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+            >
+          </div>
+
+          <div
+            id="loginMessage"
+            class="mb-3"
+            aria-live="polite"
+          ></div>
+
+            <button
+            type="submit"
+            class="btn btn-dark w-100"
+          >
+            Log in
+          </button> 
+ 
+</form>
+
+ <p class="text-center mt-4">
+          Don't have an account?
+          <a href="register.html">Create an account</a>
+        </p>
+
+      </div>
+    </div>
+  </main>
 
 </body>
 </html>
