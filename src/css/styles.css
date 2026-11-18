@@ -125,3 +125,36 @@ body {
     }
 
 }
+
+
+
+/* Listing cards */
+.listing-card {
+    border: 1px solid #E4E1DA;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.listing-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.listing-card .card-img-top {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    background-color: #F4F3EF;
+}
+
+.listing-card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.listing-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-height: 48px;
+}

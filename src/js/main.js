@@ -1,10 +1,13 @@
 import { getListings } from "./API/listings.js";
+import { createListingCard } from "./components/listingCard.js";
 
+// Find elements in index.html
 const listingsContainer = document.querySelector("#listingsContainer");
 const loadingMessage = document.querySelector("#loadingMessage");
 const errorMessage = document.querySelector("#errorMessage");
 const emptyMessage = document.querySelector("#emptyMessage");
 
+// Fetch and display listings
 async function displayListings() {
     try {
         const listings = await getListings();
@@ -16,37 +19,24 @@ async function displayListings() {
             return;
         }
 
-        listingsContainer.innerHTML = listings.map(listing => `
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100">
-                    <img
-                        src="${listing.media?.[0]?.url || "https://placehold.co/600x400?text=MODO"}"
-                        class="card-img-top"
-                        alt="${listing.title}"
-                    >
+        listingsContainer.innerHTML = "";
 
-                    <div class="card-body">
-                        <h5 class="card-title">${listing.title}</h5>
-
-                        <p class="card-text">
-                            ${listing.description || "No description available."}
-                        </p>
-
-                        <p class="fw-bold mb-0">
-                            ${listing._count?.bids ?? 0} bids
-                        </p>
-                    </div>
-                </div>
-            </div>
-        `).join("");
+        listings.forEach(listing => {
+            const listingCard = createListingCard(listing);
+            listingsContainer.appendChild(listingCard);
+        });
 
     } catch (error) {
         loadingMessage.classList.add("d-none");
-        errorMessage.textContent = "Something went wrong while loading listings.";
+
+        errorMessage.textContent =
+            "Something went wrong while loading listings.";
+
         errorMessage.classList.remove("d-none");
 
-        console.error(error);
+        console.error("Error loading listings:", error);
     }
 }
 
+// Start the page
 displayListings();
