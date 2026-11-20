@@ -1,163 +1,193 @@
-
-const API_BASE_URL = "https://v2.api.noroff.dev";
+import { getListingById } from "../API/listings.js";
 
 // Find HTML elements
-const listingsContainer = document.querySelector("#listingsContainer");
 const loadingMessage = document.querySelector("#loadingMessage");
 const errorMessage = document.querySelector("#errorMessage");
-const emptyMessage = document.querySelector("#emptyMessage");
-const searchInput = document.querySelector("#searchInput");
+const listingDetails = document.querySelector("#listingDetails");
 
-// Store all listings from the API
-let allListings = [];
+const listingImage = document.querySelector("#listingImage");
+const listingTitle = document.querySelector("#listingTitle");
+const listingDescription = document.querySelector("#listingDescription");
+const listingDeadline = document.querySelector("#listingDeadline");
+const listingSeller = document.querySelector("#listingSeller");
+const bidHistory = document.querySelector("#bidHistory");
 
-// Fetch listings from Noroff API
-async function fetchListings() {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/auction/listings?_active=true`
-    );
+// Get listing ID from URL
+const params = new URLSearchParams(window.location.search);
+const listingId = params.get("id");
 
-    const result = await response.json();
+// Format dates
+function formatDate(date) {
+    if (!date) return "Not available";
 
-    if (!response.ok) {
-      throw new Error(
-        result.errors?.[0]?.message || "Could not load listings."
-      );
+    const formattedDate = new Date(date);
+
+    if (Number.isNaN(formattedDate.getTime())) {
+        return "Not available";
     }
 
-    allListings = result.data;
-
-    displayListings(allListings);
-
-  } catch (error) {
-    errorMessage.textContent = error.message;
-
-  } finally {
-    loadingMessage.classList.add("d-none");
-  }
+    return formattedDate.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
 }
 
-// Display listings on the page
-function displayListings(listings) {
-  // Clear previous listings
-  listingsContainer.replaceChildren();
+// Display bid history
+function displayBidHistory(bids) {
+    bidHistory.replaceChildren();
 
-  // Show empty message if there are no listings
-  if (listings.length === 0) {
-    emptyMessage.classList.remove("d-none");
-    return;
-  }
+    // Check if there are any bids
+    if (!bids || bids.length === 0) {
+        const message = document.createElement("p");
+        message.classList.add("text-muted");
+        message.textContent = "No bids have been placed yet.";
 
-  emptyMessage.classList.add("d-none");
+        bidHistory.append(message);
+        return;
+    }
 
-  // Create a card for each listing
-  listings.forEach((listing) => {
-    const column = document.createElement("div");
-    column.classList.add("col");
+    // Sort bids by date, newest first
+    const sortedBids = [...bids].sort((a, b) => {
+        return new Date(b.created).getTime() -
+               new Date(a.created).getTime();
+    });
 
-    const card = document.createElement("div");
-    card.classList.add("card", "h-100");
+    // Separate latest bid from previous bids
+    const latestBid = sortedBids[0];
+    const previousBids = sortedBids.slice(1);
 
-    // Listing image
-    const image = document.createElement("img");
-    image.classList.add("card-img-top");
-    image.style.height = "220px";
-    image.style.objectFit = "cover";
+    // Latest bid section
+    const latestSection = document.createElement("div");
+    latestSection.classList.add(
+        "p-3",
+        "mb-4",
+        "rounded",
+        "border",
+        "bg-light"
+    );
 
+    const latestHeading = document.createElement("h3");
+    latestHeading.classList.add("h5", "fw-bold");
+    latestHeading.textContent = "Latest bid";
+
+    const latestAmount = document.createElement("p");
+    latestAmount.classList.add("fs-3", "fw-bold", "mb-1");
+    latestAmount.textContent = `${latestBid.amount} credits`;
+
+    const latestBidder = document.createElement("p");
+    latestBidder.classList.add("mb-1");
+    latestBidder.textContent =
+        `Bidder: ${latestBid.bidder?.name || "Unknown bidder"}`;
+
+    const latestDate = document.createElement("small");
+    latestDate.classList.add("text-muted");
+    latestDate.textContent = formatDate(latestBid.created);
+
+    latestSection.append(
+        latestHeading,
+        latestAmount,
+        latestBidder,
+        latestDate
+    );
+
+    bidHistory.append(latestSection);
+
+    // Previous bids heading
+    const historyHeading = document.createElement("h3");
+    historyHeading.classList.add("h5", "fw-bold");
+    historyHeading.textContent = "Previous bids";
+
+    bidHistory.append(historyHeading);
+
+    // Check if there are previous bids
+    if (previousBids.length === 0) {
+        const message = document.createElement("p");
+        message.classList.add("text-muted");
+        message.textContent = "This is the first bid.";
+
+        bidHistory.append(message);
+        return;
+    }
+
+    // Display previous bids
+    previousBids.forEach(bid => {
+        const bidItem = document.createElement("div");
+        bidItem.classList.add("border-bottom", "py-3");
+
+        const bidder = document.createElement("strong");
+        bidder.textContent =
+            bid.bidder?.name || "Unknown bidder";
+
+        const amount = document.createElement("p");
+        amount.classList.add("mb-1");
+        amount.textContent = `${bid.amount} credits`;
+
+        const date = document.createElement("small");
+        date.classList.add("text-muted");
+        date.textContent = formatDate(bid.created);
+
+        bidItem.append(bidder, amount, date);
+        bidHistory.append(bidItem);
+    });
+}
+
+// Display listing information
+function displayListing(listing) {
+    listingTitle.textContent =
+        listing.title || "Untitled listing";
+
+    listingDescription.textContent =
+        listing.description || "No description available.";
+
+    listingDeadline.textContent =
+        formatDate(listing.endsAt);
+
+    listingSeller.textContent =
+        listing.seller?.name || "Unknown seller";
+
+    // Display listing image
     const firstImage = listing.media?.[0];
 
     if (firstImage?.url) {
-      image.src = firstImage.url;
-      image.alt = firstImage.alt || listing.title;
+        listingImage.src = firstImage.url;
+        listingImage.alt = firstImage.alt || listing.title;
     } else {
-      image.src = "https://placehold.co/600x400?text=MODO";
-      image.alt = "No image available";
+        listingImage.src =
+            "https://placehold.co/600x400?text=MODO";
+        listingImage.alt = "No image available";
     }
 
-    // Card body
-    const cardBody = document.createElement("div");
-    cardBody.classList.add("card-body", "d-flex", "flex-column");
+    // Display bids
+    displayBidHistory(listing.bids);
 
-    // Listing title
-    const title = document.createElement("h2");
-    title.classList.add("card-title", "h5");
-    title.textContent = listing.title;
-
-    // Listing description
-    const description = document.createElement("p");
-    description.classList.add("card-text", "text-muted");
-    description.textContent =
-      listing.description || "No description available.";
-
-    // Listing tags
-    const tagsContainer = document.createElement("div");
-    tagsContainer.classList.add("mb-3");
-
-    listing.tags?.forEach((tag) => {
-      const tagElement = document.createElement("span");
-      tagElement.classList.add(
-        "badge",
-        "text-bg-light",
-        "me-1"
-      );
-      tagElement.textContent = tag;
-      tagsContainer.append(tagElement);
-    });
-
-    // Number of bids
-    const bids = document.createElement("p");
-    bids.classList.add("small", "text-muted", "mb-2");
-
-    const bidCount = listing._count?.bids ?? 0;
-    bids.textContent = `${bidCount} bids`;
-
-    // Auction end date
-    const endDate = document.createElement("p");
-    endDate.classList.add("small", "text-muted", "mt-auto");
-
-    const formattedDate = new Date(listing.endsAt).toLocaleDateString(
-      "en-GB",
-      {
-        day: "numeric",
-        month: "short",
-        year: "numeric"
-      }
-    );
-
-    endDate.textContent = `Ends: ${formattedDate}`;
-
-    // Add elements to card
-    cardBody.append(
-      title,
-      description,
-      tagsContainer,
-      bids,
-      endDate
-    );
-
-    card.append(image, cardBody);
-    column.append(card);
-    listingsContainer.append(column);
-  });
+    // Show listing details
+    listingDetails.classList.remove("d-none");
 }
 
-// Search listings
-searchInput.addEventListener("input", () => {
-  const searchTerm = searchInput.value.toLowerCase().trim();
+// Load listing from API
+async function loadListing() {
+    try {
+        if (!listingId) {
+            throw new Error("No listing ID found in the URL.");
+        }
 
-  const filteredListings = allListings.filter((listing) => {
-    const title = listing.title.toLowerCase();
-    const description = (listing.description || "").toLowerCase();
+        const listing = await getListingById(listingId);
 
-    return (
-      title.includes(searchTerm) ||
-      description.includes(searchTerm)
-    );
-  });
+        displayListing(listing);
 
-  displayListings(filteredListings);
-});
+    } catch (error) {
+        errorMessage.textContent =
+            "Could not load listing: " + error.message;
 
-// Load listings when the page opens
-fetchListings();
+        errorMessage.classList.remove("d-none");
+
+        console.error("Error loading listing:", error);
+
+    } finally {
+        loadingMessage.classList.add("d-none");
+    }
+}
+
+// Start loading the listing
+loadListing();
