@@ -37,10 +37,21 @@ export async function apiRequest(endpoint, options = {}) {
         headers
     });
 
-    // Read API response
-    const result = await response.json();
+    // Read response as text first
+    const responseText = await response.text();
 
-    // Handle errors
+    // Convert JSON response when content exists
+    let result = {};
+
+    if (responseText) {
+        try {
+            result = JSON.parse(responseText);
+        } catch {
+            throw new Error("The API returned an invalid response.");
+        }
+    }
+
+    // Handle API errors
     if (!response.ok) {
         const errorMessage =
             result.errors?.[0]?.message || "API request failed.";
@@ -48,5 +59,6 @@ export async function apiRequest(endpoint, options = {}) {
         throw new Error(errorMessage);
     }
 
+    // Return data if available
     return result.data;
 }

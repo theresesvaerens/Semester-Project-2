@@ -2,6 +2,22 @@ import { getListings } from "./API/listings.js";
 import { createListingCard } from "./components/listingCard.js";
 import { renderHeader } from "./components/header.js";
 
+// Show success message after deleting a listing
+const successMessage = sessionStorage.getItem("modoMessage");
+
+if (successMessage) {
+    const messageContainer = document.createElement("div");
+
+    messageContainer.className =
+        "alert alert-success container mt-3";
+
+    messageContainer.textContent = successMessage;
+
+    document.querySelector("main").prepend(messageContainer);
+
+    sessionStorage.removeItem("modoMessage");
+}
+
 renderHeader();
 
 const listingsContainer = document.querySelector("#listingsContainer");

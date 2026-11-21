@@ -205,7 +205,14 @@ async function handleDeleteListing() {
     try {
         await deleteListing(listingId);
 
-        window.location.href = "/";
+        // Save success message before redirecting
+        sessionStorage.setItem(
+            "modoMessage",
+            "Listing successfully deleted!"
+        );
+
+        // Return to homepage
+        window.location.href = "/index.html";
 
     } catch (error) {
         deleteErrorMessage.textContent =
@@ -254,7 +261,9 @@ async function handlePlaceBid(event) {
     try {
         await placeBid(listingId, amount);
 
-        bidSuccess.textContent = "Your bid has been placed successfully!";
+        bidSuccess.textContent =
+            "Your bid has been placed successfully!";
+
         bidSuccess.classList.remove("d-none");
 
         bidForm.reset();
@@ -305,6 +314,7 @@ function displayListing(listing) {
     } else {
         listingImage.src =
             "https://placehold.co/600x400?text=MODO";
+
         listingImage.alt = "No image available";
     }
 
