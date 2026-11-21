@@ -50,8 +50,12 @@ function displayProfile(profile) {
     document.querySelector("#profileCredits").textContent =
         formatCredits(profile.credits);
 
-    document.querySelector("#navCredits").textContent =
-        `Credits: ${formatCredits(profile.credits)}`;
+    const navCredits = document.querySelector("#navCredits");
+
+    if (navCredits) {
+        navCredits.textContent =
+            `Credits: ${formatCredits(profile.credits)}`;
+    }
 
     const avatar = document.querySelector("#profileAvatar");
     const banner = document.querySelector("#profileBanner");
@@ -82,7 +86,7 @@ function displayProfile(profile) {
 }
 
 // Create a listing card
-function createListingCard(listing) {
+function createListingCard(listing, isOwnListing = false) {
     const column = document.createElement("div");
     column.className = "col-md-6 col-lg-4";
 
@@ -93,8 +97,10 @@ function createListingCard(listing) {
     image.className = "card-img-top";
     image.style.height = "200px";
     image.style.objectFit = "cover";
+
     image.src = listing.media?.[0]?.url ||
         "https://placehold.co/600x400?text=MODO";
+
     image.alt = listing.media?.[0]?.alt || listing.title || "Listing";
 
     image.onerror = () => {
@@ -115,10 +121,23 @@ function createListingCard(listing) {
 
     const link = document.createElement("a");
     link.className = "btn btn-dark btn-sm";
-    link.href = `/pages/listing.html?id=${encodeURIComponent(listing.id)}`;
+    link.href =
+        `/pages/listing.html?id=${encodeURIComponent(listing.id)}`;
     link.textContent = "View listing";
 
     body.append(title, description, link);
+
+    // Edit button only for own listings
+    if (isOwnListing) {
+        const editLink = document.createElement("a");
+        editLink.className = "btn btn-outline-dark btn-sm ms-2";
+        editLink.href =
+            `/pages/listing-edit.html?id=${encodeURIComponent(listing.id)}`;
+        editLink.textContent = "Edit";
+
+        body.append(editLink);
+    }
+
     card.append(image, body);
     column.append(card);
 
@@ -130,13 +149,32 @@ function displayMyListings(listings) {
     const container = document.querySelector("#myListings");
     container.replaceChildren();
 
+    // Create listing button
+    const createColumn = document.createElement("div");
+    createColumn.className = "col-12 mb-3";
+
+    const createButton = document.createElement("a");
+    createButton.href = "/pages/listing-create.html";
+    createButton.className = "btn btn-dark";
+    createButton.textContent = "+ Create listing";
+
+    createColumn.append(createButton);
+    container.append(createColumn);
+
     if (!listings || listings.length === 0) {
-        container.textContent = "You haven't created any listings yet.";
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "text-muted";
+        emptyMessage.textContent =
+            "You haven't created any listings yet.";
+
+        container.append(emptyMessage);
         return;
     }
 
     listings.forEach(listing => {
-        container.append(createListingCard(listing));
+        container.append(
+            createListingCard(listing, true)
+        );
     });
 }
 
@@ -146,12 +184,12 @@ function displayMyBids(bids) {
     container.replaceChildren();
 
     if (!bids || bids.length === 0) {
-        container.textContent = "You haven't placed any bids yet.";
+        container.textContent =
+            "You haven't placed any bids yet.";
         return;
     }
 
     bids.forEach(bid => {
-        // The API returns the related listing when _listings=true.
         const listing = bid.listing || bid;
 
         if (!listing.id || !listing.title) {
@@ -163,7 +201,8 @@ function displayMyBids(bids) {
     });
 
     if (!container.children.length) {
-        container.textContent = "No listings could be displayed.";
+        container.textContent =
+            "No listings could be displayed.";
     }
 }
 
@@ -255,10 +294,12 @@ profileForm.addEventListener("submit", async (event) => {
 });
 
 // Log out
-logoutButton.addEventListener("click", () => {
-    logoutUser();
-    window.location.href = "/pages/login.html";
-});
+if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+        logoutUser();
+        window.location.href = "/pages/login.html";
+    });
+}
 
 // Load profile when page opens
 if (user?.accessToken && user?.name) {
