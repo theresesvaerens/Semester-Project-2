@@ -1,9 +1,16 @@
-import { getListingById } from "../API/listings.js";
+import {
+    getListingById,
+    deleteListing
+} from "../API/listings.js";
+
+import { getUser } from "../Utils/storage.js";
 
 // Find HTML elements
 const loadingMessage = document.querySelector("#loadingMessage");
 const errorMessage = document.querySelector("#errorMessage");
+const deleteErrorMessage = document.querySelector("#deleteErrorMessage");
 const listingDetails = document.querySelector("#listingDetails");
+const deleteListingButton = document.querySelector("#deleteListingButton");
 
 const listingImage = document.querySelector("#listingImage");
 const listingTitle = document.querySelector("#listingTitle");
@@ -15,6 +22,9 @@ const bidHistory = document.querySelector("#bidHistory");
 // Get listing ID from URL
 const params = new URLSearchParams(window.location.search);
 const listingId = params.get("id");
+
+// Get logged-in user
+const user = getUser();
 
 // Format dates
 function formatDate(date) {
@@ -37,7 +47,6 @@ function formatDate(date) {
 function displayBidHistory(bids) {
     bidHistory.replaceChildren();
 
-    // Check if there are any bids
     if (!bids || bids.length === 0) {
         const message = document.createElement("p");
         message.classList.add("text-muted");
@@ -53,7 +62,6 @@ function displayBidHistory(bids) {
                new Date(a.created).getTime();
     });
 
-    // Separate latest bid from previous bids
     const latestBid = sortedBids[0];
     const previousBids = sortedBids.slice(1);
 
@@ -100,7 +108,6 @@ function displayBidHistory(bids) {
 
     bidHistory.append(historyHeading);
 
-    // Check if there are previous bids
     if (previousBids.length === 0) {
         const message = document.createElement("p");
         message.classList.add("text-muted");
@@ -132,6 +139,50 @@ function displayBidHistory(bids) {
     });
 }
 
+// Check if the logged-in user owns the listing
+function showDeleteButton(listing) {
+    const isOwner =
+        user?.accessToken &&
+        listing.seller?.name === user.name;
+
+    if (isOwner) {
+        deleteListingButton.classList.remove("d-none");
+    }
+}
+
+// Delete listing
+async function handleDeleteListing() {
+    const confirmed = window.confirm(
+        "Are you sure you want to delete this listing? This action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    deleteListingButton.disabled = true;
+    deleteListingButton.textContent = "Deleting...";
+    deleteErrorMessage.classList.add("d-none");
+
+    try {
+        await deleteListing(listingId);
+
+        window.location.href = "/";
+
+    } catch (error) {
+        deleteErrorMessage.textContent =
+            "Could not delete listing: " + error.message;
+
+        deleteErrorMessage.classList.remove("d-none");
+
+        deleteListingButton.disabled = false;
+        deleteListingButton.textContent = "Delete listing";
+
+        console.error("Error deleting listing:", error);
+    }
+}
+
+// Listen for delete button click
+deleteListingButton.addEventListener("click", handleDeleteListing);
+
 // Display listing information
 function displayListing(listing) {
     listingTitle.textContent =
@@ -160,6 +211,9 @@ function displayListing(listing) {
 
     // Display bids
     displayBidHistory(listing.bids);
+
+    // Show delete button only to the owner
+    showDeleteButton(listing);
 
     // Show listing details
     listingDetails.classList.remove("d-none");
