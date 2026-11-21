@@ -1,70 +1,58 @@
+import { loginUser } from "../API/Auth.js";
 
-const API_BASE_URL = "https://v2.api.noroff.dev";
-
-// Find the login form
+// Find HTML elements
 const loginForm = document.querySelector("#loginForm");
-
-// Find the message element
 const loginMessage = document.querySelector("#loginMessage");
+const loginButton = loginForm.querySelector('button[type="submit"]');
 
-// Listen for form submission
+// Handle login form submission
 loginForm.addEventListener("submit", async (event) => {
-  // Prevent the page from reloading
-  event.preventDefault();
+    event.preventDefault();
 
-  // Get values from the form
-  const email = document.querySelector("#email").value.trim();
-  const password = document.querySelector("#password").value;
+    // Clear previous messages
+    loginMessage.textContent = "";
+    loginMessage.className = "mb-3";
 
-  // Prepare the login data
-  const userData = {
-    email,
-    password
-  };
+    // Get form values
+    const email = document.querySelector("#email").value.trim();
+    const password = document.querySelector("#password").value;
 
-  try {
-    // Send login request to Noroff API
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(userData)
-    });
+    // Basic validation
+    if (!email || !password) {
+        loginMessage.textContent =
+            "Please enter your email and password.";
 
-    const result = await response.json();
-
-    // Check if the request was successful
-    if (!response.ok) {
-      throw new Error(
-        result.errors?.[0]?.message || "Invalid email or password."
-      );
+        loginMessage.className = "text-danger mb-3";
+        return;
     }
 
-    // Get user data from the response
-    const user = result.data;
+    // Disable button while logging in
+    loginButton.disabled = true;
+    loginButton.textContent = "Logging in...";
 
-    // Make sure we received an access token
-    if (!user.accessToken) {
-      throw new Error("No access token received.");
+    try {
+        // Log in and save user information
+        await loginUser(email, password);
+
+        // Show success message
+        loginMessage.textContent = "Login successful!";
+        loginMessage.className = "text-success mb-3";
+
+        // Redirect to profile page
+        window.location.href = "/pages/profile.html";
+
+    } catch (error) {
+        // Show error message
+        loginMessage.textContent =
+            error.message || "Could not log in. Please try again.";
+
+        loginMessage.className = "text-danger mb-3";
+
+        console.error("Login error:", error);
+
+    } finally {
+        // Enable button again
+        loginButton.disabled = false;
+        loginButton.textContent = "Log in";
     }
-
-    // Store the access token
-    localStorage.setItem("accessToken", user.accessToken);
-
-    // Store basic user information
-    localStorage.setItem("user", JSON.stringify({
-      name: user.name,
-      email: user.email
-    }));
-
-    // Show success message
-    loginMessage.textContent = "You are now logged in!";
-    loginMessage.className = "text-success mb-3";
-
-  } catch (error) {
-    // Show error message
-    loginMessage.textContent = error.message;
-    loginMessage.className = "text-danger mb-3";
-  }
 });
