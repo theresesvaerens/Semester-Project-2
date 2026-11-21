@@ -1,4 +1,4 @@
-import { getListings } from "./API/listings.js";
+import { getListings } from "./api/listings.js";
 import { createListingCard } from "./components/listingCard.js";
 import { renderHeader } from "./components/header.js";
 
