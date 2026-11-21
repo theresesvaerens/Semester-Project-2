@@ -1,4 +1,4 @@
-import { loginUser } from "../API/Auth.js";
+import { loginUser } from "../api/auth.js";
 
 // Find HTML elements
 const loginForm = document.querySelector("#loginForm");

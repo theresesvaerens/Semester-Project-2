@@ -4,9 +4,9 @@ import {
     getListingById,
     deleteListing,
     placeBid
-} from "../API/listings.js";
+} from "../api/listings.js";
 
-import { getUser } from "../Utils/storage.js";
+import { getUser } from "../utils/storage.js";
 
 // Render the shared header
 renderHeader();

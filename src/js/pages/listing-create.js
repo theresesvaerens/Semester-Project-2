@@ -1,5 +1,5 @@
 import { renderHeader } from "../components/header.js";
-import { createListing } from "../API/listings.js";
+import { createListing } from "../api/listings.js";
 
 // Render the shared header
 renderHeader();

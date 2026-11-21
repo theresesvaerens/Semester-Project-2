@@ -5,9 +5,9 @@ import {
     updateProfile,
     getProfileListings,
     getProfileBids
-} from "../API/profiles.js";
+} from "../api/profiles.js";
 
-import { getUser } from "../Utils/storage.js";
+import { getUser } from "../utils/storage.js";
 
 // Render the shared MODO header
 renderHeader();

@@ -3,9 +3,9 @@ import { renderHeader } from "../components/header.js";
 import {
     getListingById,
     updateListing
-} from "../API/listings.js";
+} from "../api/listings.js";
 
-import { getUser } from "../Utils/storage.js";
+import { getUser } from "../utils/storage.js";
 
 // Render the shared header
 renderHeader();
