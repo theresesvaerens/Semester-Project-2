@@ -1,4 +1,4 @@
-import { getUser, removeUser } from "../Utils/storage.js";
+import { getUser, removeUser } from "../utils/storage.js";
 import { getProfile } from "../API/profiles.js";
 
 export function renderHeader() {
