@@ -1,3 +1,5 @@
+import { renderHeader } from "../components/header.js";
+
 import {
     getProfile,
     updateProfile,
@@ -6,7 +8,9 @@ import {
 } from "../API/profiles.js";
 
 import { getUser } from "../Utils/storage.js";
-import { logoutUser } from "../API/Auth.js";
+
+// Render the shared MODO header
+renderHeader();
 
 // HTML elements
 const loadingMessage = document.querySelector("#loadingMessage");
@@ -18,7 +22,12 @@ const profileFormError = document.querySelector("#profileFormError");
 const profileFormSuccess = document.querySelector("#profileFormSuccess");
 const saveProfileButton = document.querySelector("#saveProfileButton");
 
-const logoutButton = document.querySelector("#logoutButton");
+// Edit profile elements
+const editProfileButton = document.querySelector("#editProfileButton");
+const editProfileContainer = document.querySelector("#editProfileContainer");
+const cancelEditButton = document.querySelector("#cancelEditButton");
+
+// Show success message after creating, editing or deleting a listing
 const successMessage = sessionStorage.getItem("modoMessage");
 
 if (successMessage) {
@@ -46,6 +55,29 @@ function formatCredits(amount) {
     return Number(amount || 0).toLocaleString("en-US");
 }
 
+// Open edit profile form
+editProfileButton.addEventListener("click", () => {
+    editProfileContainer.classList.remove("d-none");
+    editProfileButton.classList.add("d-none");
+
+    profileFormError.classList.add("d-none");
+    profileFormSuccess.classList.add("d-none");
+});
+
+// Close edit profile form
+cancelEditButton.addEventListener("click", () => {
+    editProfileContainer.classList.add("d-none");
+    editProfileButton.classList.remove("d-none");
+
+    profileFormError.classList.add("d-none");
+    profileFormSuccess.classList.add("d-none");
+
+    // Reset fields to the currently saved profile information
+    if (currentProfile) {
+        displayProfile(currentProfile);
+    }
+});
+
 // Display profile information
 function displayProfile(profile) {
     currentProfile = profile;
@@ -62,7 +94,8 @@ function displayProfile(profile) {
     document.querySelector("#profileCredits").textContent =
         formatCredits(profile.credits);
 
-    const navCredits = document.querySelector("#navCredits");
+    // Update credits in the shared header
+    const navCredits = document.querySelector("#creditsBalance");
 
     if (navCredits) {
         navCredits.textContent =
@@ -291,6 +324,10 @@ profileForm.addEventListener("submit", async (event) => {
 
         profileFormSuccess.classList.remove("d-none");
 
+        // Close edit form after successful save
+        editProfileContainer.classList.add("d-none");
+        editProfileButton.classList.remove("d-none");
+
     } catch (error) {
         profileFormError.textContent =
             "Could not update profile: " + error.message;
@@ -304,14 +341,6 @@ profileForm.addEventListener("submit", async (event) => {
         saveProfileButton.textContent = "Save changes";
     }
 });
-
-// Log out
-if (logoutButton) {
-    logoutButton.addEventListener("click", () => {
-        logoutUser();
-        window.location.href = "/pages/login.html";
-    });
-}
 
 // Load profile when page opens
 if (user?.accessToken && user?.name) {
