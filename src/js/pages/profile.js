@@ -19,6 +19,18 @@ const profileFormSuccess = document.querySelector("#profileFormSuccess");
 const saveProfileButton = document.querySelector("#saveProfileButton");
 
 const logoutButton = document.querySelector("#logoutButton");
+const successMessage = sessionStorage.getItem("modoMessage");
+
+if (successMessage) {
+    const messageContainer = document.createElement("div");
+
+    messageContainer.className = "alert alert-success mb-4";
+    messageContainer.textContent = successMessage;
+
+    document.querySelector("main").prepend(messageContainer);
+
+    sessionStorage.removeItem("modoMessage");
+}
 
 const user = getUser();
 

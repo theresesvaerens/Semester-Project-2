@@ -212,7 +212,7 @@ async function handleDeleteListing() {
         );
 
         // Return to homepage
-        window.location.href = "/index.html";
+       window.location.href = "/pages/profile.html";
 
     } catch (error) {
         deleteErrorMessage.textContent =
