@@ -50,3 +50,16 @@ export async function deleteListing(id) {
         }
     );
 }
+
+/**
+ * Place a bid on an existing listing.
+ */
+export async function placeBid(id, amount) {
+    return await apiRequest(
+        `/auction/listings/${encodeURIComponent(id)}/bids`,
+        {
+            method: "POST",
+            body: JSON.stringify({ amount })
+        }
+    );
+}

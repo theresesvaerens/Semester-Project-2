@@ -1,6 +1,7 @@
 import {
     getListingById,
-    deleteListing
+    deleteListing,
+    placeBid
 } from "../API/listings.js";
 
 import { getUser } from "../Utils/storage.js";
@@ -10,7 +11,14 @@ const loadingMessage = document.querySelector("#loadingMessage");
 const errorMessage = document.querySelector("#errorMessage");
 const deleteErrorMessage = document.querySelector("#deleteErrorMessage");
 const listingDetails = document.querySelector("#listingDetails");
+
 const deleteListingButton = document.querySelector("#deleteListingButton");
+
+const bidForm = document.querySelector("#bidForm");
+const bidAmount = document.querySelector("#bidAmount");
+const bidError = document.querySelector("#bidError");
+const bidSuccess = document.querySelector("#bidSuccess");
+const loginToBidMessage = document.querySelector("#loginToBidMessage");
 
 const listingImage = document.querySelector("#listingImage");
 const listingTitle = document.querySelector("#listingTitle");
@@ -25,6 +33,9 @@ const listingId = params.get("id");
 
 // Get logged-in user
 const user = getUser();
+
+// Keep track of the current listing
+let currentListing = null;
 
 // Format dates
 function formatDate(date) {
@@ -59,7 +70,7 @@ function displayBidHistory(bids) {
     // Sort bids by date, newest first
     const sortedBids = [...bids].sort((a, b) => {
         return new Date(b.created).getTime() -
-               new Date(a.created).getTime();
+            new Date(a.created).getTime();
     });
 
     const latestBid = sortedBids[0];
@@ -139,15 +150,44 @@ function displayBidHistory(bids) {
     });
 }
 
-// Check if the logged-in user owns the listing
-function showDeleteButton(listing) {
-    const isOwner =
-        user?.accessToken &&
-        listing.seller?.name === user.name;
-
-    if (isOwner) {
-        deleteListingButton.classList.remove("d-none");
+// Get the highest current bid
+function getHighestBid(bids) {
+    if (!bids || bids.length === 0) {
+        return 0;
     }
+
+    return Math.max(...bids.map(bid => Number(bid.amount) || 0));
+}
+
+// Check whether the logged-in user owns the listing
+function isListingOwner(listing) {
+    return Boolean(
+        user?.accessToken &&
+        listing.seller?.name === user.name
+    );
+}
+
+// Show the correct actions for the current user
+function displayUserActions(listing) {
+    if (!user?.accessToken) {
+        loginToBidMessage.classList.remove("d-none");
+        return;
+    }
+
+    if (isListingOwner(listing)) {
+        deleteListingButton.classList.remove("d-none");
+
+        loginToBidMessage.textContent =
+            "You cannot place a bid on your own listing.";
+
+        loginToBidMessage.classList.remove("d-none");
+        return;
+    }
+
+    bidForm.classList.remove("d-none");
+
+    // Set the minimum bid to one credit above the highest bid
+    bidAmount.min = getHighestBid(listing.bids) + 1;
 }
 
 // Delete listing
@@ -180,11 +220,70 @@ async function handleDeleteListing() {
     }
 }
 
-// Listen for delete button click
-deleteListingButton.addEventListener("click", handleDeleteListing);
+// Place a bid
+async function handlePlaceBid(event) {
+    event.preventDefault();
+
+    bidError.classList.add("d-none");
+    bidSuccess.classList.add("d-none");
+
+    const amount = Number(bidAmount.value);
+    const highestBid = getHighestBid(currentListing.bids);
+
+    if (!Number.isInteger(amount) || amount < 1) {
+        bidError.textContent = "Please enter a valid whole number.";
+        bidError.classList.remove("d-none");
+        return;
+    }
+
+    if (amount <= highestBid) {
+        bidError.textContent =
+            `Your bid must be higher than ${highestBid} credits.`;
+
+        bidError.classList.remove("d-none");
+        return;
+    }
+
+    const submitButton = bidForm.querySelector(
+        'button[type="submit"]'
+    );
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Placing bid...";
+
+    try {
+        await placeBid(listingId, amount);
+
+        bidSuccess.textContent = "Your bid has been placed successfully!";
+        bidSuccess.classList.remove("d-none");
+
+        bidForm.reset();
+
+        // Fetch the listing again to show the updated bid history
+        currentListing = await getListingById(listingId);
+
+        displayBidHistory(currentListing.bids);
+
+        bidAmount.min = getHighestBid(currentListing.bids) + 1;
+
+    } catch (error) {
+        bidError.textContent =
+            "Could not place bid: " + error.message;
+
+        bidError.classList.remove("d-none");
+
+        console.error("Error placing bid:", error);
+
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Place bid";
+    }
+}
 
 // Display listing information
 function displayListing(listing) {
+    currentListing = listing;
+
     listingTitle.textContent =
         listing.title || "Untitled listing";
 
@@ -209,13 +308,10 @@ function displayListing(listing) {
         listingImage.alt = "No image available";
     }
 
-    // Display bids
+    // Display bids and user actions
     displayBidHistory(listing.bids);
+    displayUserActions(listing);
 
-    // Show delete button only to the owner
-    showDeleteButton(listing);
-
-    // Show listing details
     listingDetails.classList.remove("d-none");
 }
 
@@ -242,6 +338,10 @@ async function loadListing() {
         loadingMessage.classList.add("d-none");
     }
 }
+
+// Listen for button clicks and form submission
+deleteListingButton.addEventListener("click", handleDeleteListing);
+bidForm.addEventListener("submit", handlePlaceBid);
 
 // Start loading the listing
 loadListing();
