@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | MODO</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="/src/css/styles.css">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg bg-white border-bottom">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold fs-3" href="/">MODO</a>
+
+            <div class="d-flex align-items-center gap-3">
+                <a href="/" class="text-decoration-none text-dark">
+                    Explore
+                </a>
+
+                <span id="navCredits" class="fw-semibold">
+                    Credits: --
+                </span>
+
+                <button id="logoutButton" class="btn btn-dark btn-sm">
+                    Log out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+
+        <p id="loadingMessage" class="text-muted text-center">
+            Loading your profile...
+        </p>
+
+        <div
+            id="profileError"
+            class="alert alert-danger d-none"
+            role="alert"
+        ></div>
+
+        <section id="profileContent" class="d-none">
+
+            <div class="mb-4">
+                <img
+                    id="profileBanner"
+                    src="https://placehold.co/1200x300?text=MODO"
+                    alt="Profile banner"
+                    class="w-100 rounded object-fit-cover"
+                    style="height: 240px;"
+                >
+            </div>
+
+            <div class="row align-items-center mb-5">
+
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center gap-3">
+
+                        <img
+                            id="profileAvatar"
+                            src="https://placehold.co/120x120?text=M"
+                            alt="Profile avatar"
+                            class="rounded-circle border"
+                            style="width: 110px; height: 110px; object-fit: cover;"
+                        >
+
+                        <div>
+                            <h1 id="profileName" class="fw-bold mb-1">
+                                My profile
+                            </h1>
+
+                            <p id="profileEmail" class="text-muted mb-1"></p>
+
+                            <p id="profileBio" class="mb-0"></p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                    <div class="bg-white border rounded p-3">
+                        <p class="text-muted mb-1">Available credits</p>
+                        <h2 id="profileCredits" class="fw-bold mb-0">
+                            0
+                        </h2>
+                    </div>
+                </div>
+
+            </div>
+
+            <section class="bg-white border rounded p-4 mb-5">
+
+                <h2 class="h4 fw-bold mb-4">Edit profile</h2>
+
+                <form id="profileForm">
+
+                    <div class="mb-3">
+                        <label for="profileBioInput" class="form-label">
+                            Bio
+                        </label>
+
+                        <textarea
+                            id="profileBioInput"
+                            class="form-control"
+                            rows="3"
+                            maxlength="159"
+                            placeholder="Tell other students a little about yourself..."
+                        ></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="avatarInput" class="form-label">
+                            Avatar image URL
+                        </label>
+
+                        <input
+                            type="url"
+                            id="avatarInput"
+                            class="form-control"
+                            placeholder="https://example.com/avatar.jpg"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bannerInput" class="form-label">
+                            Banner image URL
+                        </label>
+
+                        <input
+                            type="url"
+                            id="bannerInput"
+                            class="form-control"
+                            placeholder="https://example.com/banner.jpg"
+                        >
+                    </div>
+
+                    <div
+                        id="profileFormError"
+                        class="alert alert-danger d-none"
+                        role="alert"
+                    ></div>
+
+                    <div
+                        id="profileFormSuccess"
+                        class="alert alert-success d-none"
+                        role="alert"
+                    ></div>
+
+                    <button
+                        type="submit"
+                        id="saveProfileButton"
+                        class="btn btn-dark"
+                    >
+                        Save changes
+                    </button>
+
+                </form>
+            </section>
+
+            <section class="mb-5">
+
+                <h2 class="h3 fw-bold mb-4">My listings</h2>
+
+                <div
+                    id="myListings"
+                    class="row g-4"
+                ></div>
+
+            </section>
+
+            <section class="mb-5">
+
+                <h2 class="h3 fw-bold mb-4">Listings I've bid on</h2>
+
+                <div
+                    id="myBids"
+                    class="row g-4"
+                ></div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+    <script type="module" src="/src/js/Pages/profile.js"></script>
+
+</body>
+</html>
