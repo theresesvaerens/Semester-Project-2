@@ -1,4 +1,8 @@
+import { renderHeader } from "../components/header.js";
 import { createListing } from "../API/listings.js";
+
+// Render the shared header
+renderHeader();
 
 // Find the form and feedback elements
 const createListingForm = document.querySelector("#createListingForm");
@@ -13,9 +17,14 @@ createListingForm.addEventListener("submit", async (event) => {
 
     // Get values from the form
     const title = document.querySelector("#listingTitle").value.trim();
-    const description = document.querySelector("#listingDescription").value.trim();
+
+    const description =
+        document.querySelector("#listingDescription").value.trim();
+
     const deadline = document.querySelector("#listingDeadline").value;
+
     const imageUrl = document.querySelector("#listingImage").value.trim();
+
     const tagsInput = document.querySelector("#listingTags").value;
 
     // Convert tags into an array
@@ -39,7 +48,7 @@ createListingForm.addEventListener("submit", async (event) => {
         // Send listing to the API
         await createListing(listingData);
 
-        // Show success message on profile page
+        // Save success message before redirecting
         sessionStorage.setItem(
             "modoMessage",
             "Listing successfully created!"

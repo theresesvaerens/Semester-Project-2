@@ -1,3 +1,5 @@
+import { renderHeader } from "../components/header.js";
+
 import {
     getListingById,
     deleteListing,
@@ -5,6 +7,9 @@ import {
 } from "../API/listings.js";
 
 import { getUser } from "../Utils/storage.js";
+
+// Render the shared header
+renderHeader();
 
 // Find HTML elements
 const loadingMessage = document.querySelector("#loadingMessage");
@@ -211,8 +216,8 @@ async function handleDeleteListing() {
             "Listing successfully deleted!"
         );
 
-        // Return to homepage
-       window.location.href = "/pages/profile.html";
+        // Redirect to profile page
+        window.location.href = "/pages/profile.html";
 
     } catch (error) {
         deleteErrorMessage.textContent =

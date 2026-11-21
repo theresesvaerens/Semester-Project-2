@@ -1,5 +1,14 @@
-import { getListingById, updateListing } from "../API/listings.js";
+import { renderHeader } from "../components/header.js";
+
+import {
+    getListingById,
+    updateListing
+} from "../API/listings.js";
+
 import { getUser } from "../Utils/storage.js";
+
+// Render the shared header
+renderHeader();
 
 // Find the elements we need from the HTML.
 const editListingForm = document.querySelector("#editListingForm");
@@ -42,13 +51,16 @@ async function loadListing() {
             throw new Error("You can only edit your own listings.");
         }
 
-        document.querySelector("#listingTitle").value = listing.title || "";
+        document.querySelector("#listingTitle").value =
+            listing.title || "";
+
         document.querySelector("#listingDescription").value =
             listing.description || "";
 
         // Convert the date to the format required by datetime-local.
         if (listing.endsAt) {
             const date = new Date(listing.endsAt);
+
             const localDate = new Date(
                 date.getTime() - date.getTimezoneOffset() * 60000
             );
@@ -69,6 +81,7 @@ async function loadListing() {
     } catch (error) {
         loadingMessage.classList.add("d-none");
         showError(error.message);
+
         console.error("Error loading listing:", error);
     }
 }
@@ -79,10 +92,14 @@ editListingForm.addEventListener("submit", async (event) => {
     hideMessages();
 
     const title = document.querySelector("#listingTitle").value.trim();
+
     const description =
         document.querySelector("#listingDescription").value.trim();
+
     const deadline = document.querySelector("#listingDeadline").value;
+
     const imageUrl = document.querySelector("#listingImage").value.trim();
+
     const tagsInput = document.querySelector("#listingTags").value;
 
     const tags = tagsInput
@@ -108,7 +125,7 @@ editListingForm.addEventListener("submit", async (event) => {
         // Update the listing.
         await updateListing(listingId, listingData);
 
-        // Show success message on profile page.
+        // Save success message before redirecting.
         sessionStorage.setItem(
             "modoMessage",
             "Listing successfully updated!"
@@ -119,6 +136,7 @@ editListingForm.addEventListener("submit", async (event) => {
 
     } catch (error) {
         showError(error.message);
+
         console.error("Error updating listing:", error);
     }
 });
