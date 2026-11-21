@@ -1,5 +1,8 @@
 import { getListings } from "./API/listings.js";
 import { createListingCard } from "./components/listingCard.js";
+import { renderHeader } from "./components/header.js";
+
+renderHeader();
 
 const listingsContainer = document.querySelector("#listingsContainer");
 const loadingMessage = document.querySelector("#loadingMessage");
