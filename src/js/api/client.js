@@ -1,4 +1,4 @@
-import { getUser } from "../Utils/storage.js";
+import { getUser } from "../utils/storage.js";
 
 const API_BASE = "https://v2.api.noroff.dev";
 

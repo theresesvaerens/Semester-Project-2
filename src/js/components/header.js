@@ -1,5 +1,5 @@
 import { getUser, removeUser } from "../utils/storage.js";
-import { getProfile } from "../API/profiles.js";
+import { getProfile } from "../api/profiles.js";
 
 export function renderHeader() {
     const header = document.querySelector("#siteHeader");
