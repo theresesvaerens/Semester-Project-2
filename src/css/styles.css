@@ -158,3 +158,10 @@ body {
     font-weight: 600;
     min-height: 48px;
 }
+
+.credits-balance {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--charcoal, #20201E);
+    white-space: nowrap;
+}
