@@ -3,7 +3,7 @@ import { getUser } from "../Utils/storage.js";
 const API_BASE = "https://v2.api.noroff.dev";
 
 // Get the API key from the project environment.
-const API_KEY = import.meta.env.VITE_API_KEY;
+const API_KEY = import.meta.env?.VITE_API_KEY;
 
 /**
  * Send a request to the Noroff API.
