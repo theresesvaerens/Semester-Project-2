@@ -3,15 +3,13 @@ import { createListing } from "../API/listings.js";
 // Find the form and feedback elements
 const createListingForm = document.querySelector("#createListingForm");
 const formError = document.querySelector("#formError");
-const formSuccess = document.querySelector("#formSuccess");
 
 // Listen for form submission
 createListingForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    // Hide previous messages
+    // Hide previous error message
     formError.classList.add("d-none");
-    formSuccess.classList.add("d-none");
 
     // Get values from the form
     const title = document.querySelector("#listingTitle").value.trim();
@@ -41,10 +39,14 @@ createListingForm.addEventListener("submit", async (event) => {
         // Send listing to the API
         await createListing(listingData);
 
-        formSuccess.textContent = "Your listing has been created!";
-        formSuccess.classList.remove("d-none");
+        // Show success message on profile page
+        sessionStorage.setItem(
+            "modoMessage",
+            "Listing successfully created!"
+        );
 
-        createListingForm.reset();
+        // Redirect to profile page
+        window.location.href = "/pages/profile.html";
 
     } catch (error) {
         formError.textContent = error.message;

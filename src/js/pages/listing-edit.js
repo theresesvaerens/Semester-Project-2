@@ -5,7 +5,6 @@ import { getUser } from "../Utils/storage.js";
 const editListingForm = document.querySelector("#editListingForm");
 const loadingMessage = document.querySelector("#loadingMessage");
 const formError = document.querySelector("#formError");
-const formSuccess = document.querySelector("#formSuccess");
 
 // Get the listing ID from the URL.
 const params = new URLSearchParams(window.location.search);
@@ -23,7 +22,6 @@ function showError(message) {
 // Hide previous messages.
 function hideMessages() {
     formError.classList.add("d-none");
-    formSuccess.classList.add("d-none");
 }
 
 // Load the listing and fill in the form.
@@ -107,10 +105,17 @@ editListingForm.addEventListener("submit", async (event) => {
                 : []
         };
 
+        // Update the listing.
         await updateListing(listingId, listingData);
 
-        formSuccess.textContent = "Your listing has been updated!";
-        formSuccess.classList.remove("d-none");
+        // Show success message on profile page.
+        sessionStorage.setItem(
+            "modoMessage",
+            "Listing successfully updated!"
+        );
+
+        // Redirect to profile page.
+        window.location.href = "/pages/profile.html";
 
     } catch (error) {
         showError(error.message);
