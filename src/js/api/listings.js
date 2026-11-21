@@ -25,3 +25,16 @@ export async function createListing(listingData) {
         body: JSON.stringify(listingData)
     });
 }
+
+/**
+ * Update an existing listing.
+ */
+export async function updateListing(id, listingData) {
+    return await apiRequest(
+        `/auction/listings/${encodeURIComponent(id)}`,
+        {
+            method: "PUT",
+            body: JSON.stringify(listingData)
+        }
+    );
+}
