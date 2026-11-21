@@ -38,3 +38,15 @@ export async function updateListing(id, listingData) {
         }
     );
 }
+
+/**
+ * Delete an existing listing.
+ */
+export async function deleteListing(id) {
+    return await apiRequest(
+        `/auction/listings/${encodeURIComponent(id)}`,
+        {
+            method: "DELETE"
+        }
+    );
+}
